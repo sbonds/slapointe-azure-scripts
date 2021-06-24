@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [Parameter(HelpMessage = 'Will output credentials if withing this number of days, use 0 to report only expired and valid as of today')]
+    [Parameter(HelpMessage = 'Will output credentials if within this number of days, use 0 to report only expired and valid as of today')]
     $ExpiresInDays = 90
 )
 

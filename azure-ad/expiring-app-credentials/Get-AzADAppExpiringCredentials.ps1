@@ -4,7 +4,7 @@ param(
     $ExpiresInDays = 90
 )
 
-Write-Host 'Gathering necessary information...'
+Write-Verbose 'Gathering necessary information...'
 $applications = Get-AzADApplication
 $servicePrincipals = Get-AzADServicePrincipal
 
@@ -12,7 +12,7 @@ $appWithCredentials = @()
 $appWithCredentials += $applications | Sort-Object -Property DisplayName | ForEach-Object {
     $application = $_
     $servicePrincipals | Where-Object ApplicationId -eq $application.ApplicationId
-    Write-Verbose ('Fetching information for application {0}' -f $application.DisplayName)
+    Write-Verbose ('  Fetching information for application {0}' -f $application.DisplayName)
     $application | `
         Get-AzADAppCredential -ErrorAction SilentlyContinue | `
         Select-Object `
@@ -25,7 +25,7 @@ $appWithCredentials += $applications | Sort-Object -Property DisplayName | ForEa
     @{Name = 'EndDate'; Expression = { $_.EndDate -as [datetime] } }
 }
 
-Write-Host 'Validating expiration data...'
+Write-Verbose 'Validating expiration data...'
 $today = (Get-Date).ToUniversalTime()
 $limitDate = $today.AddDays($ExpiresInDays)
 $appWithCredentials | Sort-Object EndDate | ForEach-Object {
@@ -40,4 +40,5 @@ $appWithCredentials | Sort-Object EndDate | ForEach-Object {
     }
 }
 
+Write-Verbose 'Sending CSV output'
 $appWithCredentials | ConvertTo-CSV -NoTypeInformation

@@ -13,7 +13,16 @@ $appWithCredentials += $applications | Sort-Object -Property DisplayName | ForEa
     $application = $_
     $servicePrincipals | Where-Object ApplicationId -eq $application.ApplicationId
     Write-Verbose ('Fetching information for application {0}' -f $application.DisplayName)
-    $application | Get-AzADAppCredential -ErrorAction SilentlyContinue | Select-Object -Property @{Name = 'DisplayName'; Expression = { $application.DisplayName } }, @{Name = 'ObjectId'; Expression = { $application.Id } }, @{Name = 'ApplicationId'; Expression = { $application.ApplicationId } }, @{Name = 'KeyId'; Expression = { $_.KeyId } }, @{Name = 'Type'; Expression = { $_.Type } }, @{Name = 'StartDate'; Expression = { $_.StartDate -as [datetime] } }, @{Name = 'EndDate'; Expression = { $_.EndDate -as [datetime] } }
+    $application | `
+        Get-AzADAppCredential -ErrorAction SilentlyContinue | `
+        Select-Object `
+        -Property @{Name = 'DisplayName'; Expression = { $application.DisplayName } }, `
+    @{Name = 'ObjectId'; Expression = { $application.Id } }, `
+    @{Name = 'ApplicationId'; Expression = { $application.ApplicationId } }, `
+    @{Name = 'KeyId'; Expression = { $_.KeyId } }, `
+    @{Name = 'Type'; Expression = { $_.Type } }, `
+    @{Name = 'StartDate'; Expression = { $_.StartDate -as [datetime] } }, `
+    @{Name = 'EndDate'; Expression = { $_.EndDate -as [datetime] } }
 }
 
 Write-Host 'Validating expiration data...'
@@ -31,5 +40,4 @@ $appWithCredentials | Sort-Object EndDate | ForEach-Object {
     }
 }
 
-$appWithCredentials
-Write-Host 'Done.'
+$appWithCredentials | ConvertTo-CSV -NoTypeInformation
